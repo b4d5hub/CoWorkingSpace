@@ -7,4 +7,6 @@ import java.util.List;
 public interface SalleService extends Remote {
     List<SalleDTO> getAllSalles() throws RemoteException;
     ReservationResult reserverSalle(Long salleId, String client) throws RemoteException;
+    // New overload supporting date/time window
+    ReservationResult reserverSalle(CreateReservationCommand command) throws RemoteException;
 }

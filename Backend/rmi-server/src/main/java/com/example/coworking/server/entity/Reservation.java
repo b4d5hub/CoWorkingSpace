@@ -15,6 +15,16 @@ public class Reservation {
 
     private LocalDateTime createdAt;
 
+    // New fields for time-windowed reservations
+    @Column(name = "start_at")
+    private LocalDateTime startAt;
+
+    @Column(name = "end_at")
+    private LocalDateTime endAt;
+
+    @Column(name = "status", length = 16)
+    private String status; // PENDING | CONFIRMED | CANCELLED
+
     @ManyToOne
     @JoinColumn(name = "salle_id")
     private Salle salle;
@@ -33,4 +43,13 @@ public class Reservation {
     public LocalDateTime getCreatedAt() { return createdAt; }
     public Salle getSalle() { return salle; }
     public void setSalle(Salle salle) { this.salle = salle; }
+
+    public LocalDateTime getStartAt() { return startAt; }
+    public void setStartAt(LocalDateTime startAt) { this.startAt = startAt; }
+
+    public LocalDateTime getEndAt() { return endAt; }
+    public void setEndAt(LocalDateTime endAt) { this.endAt = endAt; }
+
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 }
