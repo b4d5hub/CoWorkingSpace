@@ -36,6 +36,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Plus, Pencil, Trash2, Users, MapPin, ArrowLeft, Server } from 'lucide-react';
 import type { Room } from '../App';
 import { toast } from 'sonner@2.0.3';
+import { formatPricePerHour } from '../lib/pricing';
 
 type AdminRoomsProps = {
   rooms: Room[];
@@ -56,6 +57,7 @@ export function AdminRooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom, onBack 
   const [formAmenities, setFormAmenities] = useState('');
   const [formImageUrl, setFormImageUrl] = useState('');
   const [formAvailable, setFormAvailable] = useState('true');
+  const [formPrice, setFormPrice] = useState('');
 
   const resetForm = () => {
     setFormName('');
@@ -64,6 +66,7 @@ export function AdminRooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom, onBack 
     setFormAmenities('');
     setFormImageUrl('');
     setFormAvailable('true');
+    setFormPrice('');
   };
 
   const handleAddRoom = (e: React.FormEvent) => {
@@ -76,6 +79,7 @@ export function AdminRooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom, onBack 
       imageUrl:
         formImageUrl || 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80',
       available: formAvailable === 'true',
+      pricePerHour: formPrice ? Number(formPrice) : undefined,
     });
     toast.success('Room added successfully', {
       description: `RMI server synchronized: ${formLocation}`,
@@ -94,6 +98,7 @@ export function AdminRooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom, onBack 
         amenities: formAmenities.split(',').map((a) => a.trim()),
         imageUrl: formImageUrl,
         available: formAvailable === 'true',
+        pricePerHour: formPrice ? Number(formPrice) : undefined,
       });
       toast.success('Room updated successfully', {
         description: `Changes synchronized across all RMI servers`,
@@ -109,6 +114,7 @@ export function AdminRooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom, onBack 
     setFormLocation(room.location);
     setFormCapacity(room.capacity.toString());
     setFormAmenities(room.amenities.join(', '));
+    setFormPrice(room.pricePerHour !== undefined ? String(room.pricePerHour) : '');
     setFormImageUrl(room.imageUrl);
     setFormAvailable(room.available ? 'true' : 'false');
   };
@@ -197,6 +203,18 @@ export function AdminRooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom, onBack 
                       />
                     </div>
                     <div className="space-y-2">
+                      <Label htmlFor="price">Price per hour</Label>
+                      <Input
+                        id="price"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={formPrice}
+                        onChange={(e) => setFormPrice(e.target.value)}
+                        placeholder="e.g., 80.00"
+                      />
+                    </div>
+                    <div className="space-y-2">
                       <Label htmlFor="amenities">Equipment (comma-separated)</Label>
                       <Input
                         id="amenities"
@@ -256,6 +274,7 @@ export function AdminRooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom, onBack 
                   <TableHead className="text-muted-foreground">Room Name</TableHead>
                   <TableHead className="text-muted-foreground">Branch</TableHead>
                   <TableHead className="text-muted-foreground">Capacity</TableHead>
+                  <TableHead className="text-muted-foreground">Price/hr</TableHead>
                   <TableHead className="text-muted-foreground">Equipment</TableHead>
                   <TableHead className="text-muted-foreground">Status</TableHead>
                   <TableHead className="text-muted-foreground">Actions</TableHead>
@@ -277,6 +296,13 @@ export function AdminRooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom, onBack 
                         <Users className="w-3 h-3 text-foreground" />
                         <span className="text-foreground">{room.capacity}</span>
                       </div>
+                    </TableCell>
+                    <TableCell>
+                      {room.pricePerHour !== undefined ? (
+                        <span className="text-foreground">{formatPricePerHour(room.pricePerHour)}</span>
+                      ) : (
+                        <span className="text-muted-foreground">—</span>
+                      )}
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-wrap gap-1">
@@ -370,6 +396,17 @@ export function AdminRooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom, onBack 
                                     onChange={(e) => setFormCapacity(e.target.value)}
                                     min="1"
                                     required
+                                  />
+                                </div>
+                                <div className="space-y-2">
+                                  <Label htmlFor="edit-price">Price per hour</Label>
+                                  <Input
+                                    id="edit-price"
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    value={formPrice}
+                                    onChange={(e) => setFormPrice(e.target.value)}
                                   />
                                 </div>
                                 <div className="space-y-2">

@@ -3,6 +3,7 @@ package com.example.coworking.server.entity;
 
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -26,6 +27,9 @@ public class Salle {
     @Column(nullable = false)
     private boolean available = true;
 
+    @Column(name = "price_per_hour", precision = 10, scale = 2)
+    private BigDecimal pricePerHour;
+
     @ElementCollection
     @CollectionTable(name = "room_amenities", joinColumns = @JoinColumn(name = "room_id"))
     @Column(name = "name", length = 60)
@@ -47,6 +51,16 @@ public class Salle {
         if (amenities != null) this.amenities = amenities;
     }
 
+    public Salle(String nom, int capacite, String location, String imageUrl, boolean available, List<String> amenities, BigDecimal pricePerHour) {
+        this.nom = nom;
+        this.capacite = capacite;
+        this.location = location;
+        this.imageUrl = imageUrl;
+        this.available = available;
+        if (amenities != null) this.amenities = amenities;
+        this.pricePerHour = pricePerHour;
+    }
+
     public Long getId() { return id; }
     public String getNom() { return nom; }
     public void setNom(String nom) { this.nom = nom; }
@@ -61,6 +75,9 @@ public class Salle {
     public void setAvailable(boolean available) { this.available = available; }
     public List<String> getAmenities() { return amenities; }
     public void setAmenities(List<String> amenities) { this.amenities = amenities; }
+
+    public BigDecimal getPricePerHour() { return pricePerHour; }
+    public void setPricePerHour(BigDecimal pricePerHour) { this.pricePerHour = pricePerHour; }
 
     @Override
     public boolean equals(Object o) {

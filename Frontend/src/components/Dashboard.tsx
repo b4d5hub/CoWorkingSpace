@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
@@ -21,18 +21,24 @@ import {
   MoreHorizontal,
 } from 'lucide-react';
 import type { Room, Reservation } from '../App';
+import { formatPricePerHour } from '../lib/pricing';
 
 type DashboardProps = {
   rooms: Room[];
   reservations: Reservation[];
   onSelectRoom: (room: Room) => void;
   initialLocation?: string;
+  onLocationChange?: (location: string) => void;
 };
 
-export function Dashboard({ rooms, reservations, onSelectRoom, initialLocation = 'all' }: DashboardProps) {
+export function Dashboard({ rooms, reservations, onSelectRoom, initialLocation = 'all', onLocationChange }: DashboardProps) {
   const [selectedLocation, setSelectedLocation] = useState<string>(initialLocation);
   const [selectedCapacity, setSelectedCapacity] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
+
+  useEffect(() => {
+    setSelectedLocation(initialLocation);
+  }, [initialLocation]);
 
   const locations = ['all', ...Array.from(new Set(rooms.map((room) => room.location)))];
 
@@ -100,7 +106,7 @@ export function Dashboard({ rooms, reservations, onSelectRoom, initialLocation =
             </div>
             <div className="space-y-2">
               <label className="text-sm text-foreground">Location</label>
-              <Select value={selectedLocation} onValueChange={setSelectedLocation}>
+              <Select value={selectedLocation} onValueChange={(val) => { setSelectedLocation(val); onLocationChange?.(val); }}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select location" />
                 </SelectTrigger>
@@ -156,6 +162,9 @@ export function Dashboard({ rooms, reservations, onSelectRoom, initialLocation =
                       <MapPin className="w-3 h-3" />
                       {room.location}
                     </CardDescription>
+                    {room.pricePerHour !== undefined && (
+                      <div className="mt-1 text-sm text-foreground">{formatPricePerHour(room.pricePerHour)}</div>
+                    )}
                   </div>
                   {room.available ? (
                     <Badge className="bg-green-500/10 text-green-600 border-green-500/30" variant="outline">

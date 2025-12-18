@@ -33,6 +33,7 @@ export type Room = {
   amenities: string[];
   imageUrl: string;
   available: boolean;
+  pricePerHour?: number;
 };
 
 export type Reservation = {
@@ -128,7 +129,10 @@ export default function App() {
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(
     null,
   );
-  const [initialLocationFilter, setInitialLocationFilter] = useState<string>('all');
+  const [initialLocationFilter, setInitialLocationFilter] = useState<string>(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('location') || 'all';
+  });
   const [users, setUsers] = useState<AppUser[]>([]);
   const [rooms, setRooms] = useState<Room[]>([]);
 
@@ -136,6 +140,8 @@ export default function App() {
   useEffect(() => {
     const onPopState = () => {
       setCurrentPage(pathToPage(window.location.pathname));
+      const params = new URLSearchParams(window.location.search);
+      setInitialLocationFilter(params.get('location') || 'all');
     };
     window.addEventListener('popstate', onPopState);
     return () => window.removeEventListener('popstate', onPopState);
@@ -143,8 +149,11 @@ export default function App() {
 
   useEffect(() => {
     const expected = pageToPath(currentPage);
-    if (window.location.pathname !== expected) {
-      window.history.pushState(null, "", expected);
+    const currentSearch = window.location.search || '';
+    const desired = `${expected}${currentSearch}`;
+    const current = `${window.location.pathname}${window.location.search}`;
+    if (current !== desired) {
+      window.history.pushState(null, "", desired);
     }
   }, [currentPage]);
 
@@ -206,7 +215,23 @@ export default function App() {
 
   const handleLogin = (user: User) => {
     setCurrentUser(user);
-    setCurrentPage("dashboard");
+    // After login, redirect back if a redirect param exists
+    const params = new URLSearchParams(window.location.search);
+    const redirect = params.get('redirect');
+    if (redirect) {
+      try {
+        const targetUrl = new URL(redirect, window.location.origin);
+        window.history.pushState(null, "", `${targetUrl.pathname}${targetUrl.search}`);
+        setCurrentPage(pathToPage(targetUrl.pathname));
+        // If target includes a location, sync state
+        const loc = targetUrl.searchParams.get('location');
+        if (loc) setInitialLocationFilter(loc);
+      } catch {
+        setCurrentPage("dashboard");
+      }
+    } else {
+      setCurrentPage("dashboard");
+    }
   };
 
   const handleLogout = () => {
@@ -216,6 +241,21 @@ export default function App() {
   };
 
   const handleSelectRoom = (room: Room) => {
+    // If not authenticated, redirect to login and preserve intended target
+    if (!currentUser) {
+      const params = new URLSearchParams(window.location.search);
+      // ensure location in query reflects current filter to persist after login
+      if (initialLocationFilter && initialLocationFilter !== 'all') {
+        params.set('location', initialLocationFilter);
+      }
+      params.set('roomId', room.id);
+      const target = `/dashboard?${params.toString()}`;
+      const loginParams = new URLSearchParams();
+      loginParams.set('redirect', target);
+      window.history.pushState(null, "", `/login?${loginParams.toString()}`);
+      setCurrentPage("login");
+      return;
+    }
     setSelectedRoom(room);
     setCurrentPage("reservation");
   };
@@ -342,8 +382,14 @@ export default function App() {
   };
 
   const handleNavigateToLocation = (location: string) => {
-    setInitialLocationFilter(location);
-    setCurrentPage("login");
+    // Navigate to dashboard with selected location in query
+    const params = new URLSearchParams(window.location.search);
+    if (location && location !== 'all') params.set('location', location);
+    else params.delete('location');
+    const search = params.toString();
+    window.history.pushState(null, "", `/dashboard${search ? `?${search}` : ''}`);
+    setInitialLocationFilter(location || 'all');
+    setCurrentPage("dashboard");
   };
 
   // Fetch required data when page changes
@@ -358,6 +404,24 @@ export default function App() {
       loadUsers();
     }
   }, [currentPage]);
+
+  // If we land on dashboard with a preserved roomId in the URL and user is logged in,
+  // auto-continue to the reservation for that room, then clean the param.
+  useEffect(() => {
+    if (currentPage !== 'dashboard' || !currentUser) return;
+    const params = new URLSearchParams(window.location.search);
+    const roomId = params.get('roomId');
+    if (!roomId) return;
+    const room = rooms.find(r => r.id === roomId);
+    if (room) {
+      setSelectedRoom(room);
+      // remove roomId from URL to avoid re-trigger on back/refresh
+      params.delete('roomId');
+      const search = params.toString();
+      window.history.replaceState(null, "", `/dashboard${search ? `?${search}` : ''}`);
+      setCurrentPage('reservation');
+    }
+  }, [currentPage, currentUser, rooms]);
 
   if (currentPage === "home") {
     return (
@@ -406,6 +470,14 @@ export default function App() {
             reservations={reservations}
             onSelectRoom={handleSelectRoom}
             initialLocation={initialLocationFilter}
+            onLocationChange={(loc) => {
+              setInitialLocationFilter(loc || 'all');
+              const params = new URLSearchParams(window.location.search);
+              if (loc && loc !== 'all') params.set('location', loc);
+              else params.delete('location');
+              const search = params.toString();
+              window.history.replaceState(null, "", `/dashboard${search ? `?${search}` : ''}`);
+            }}
           />
         )}
         {currentPage === "reservation" &&
@@ -422,6 +494,7 @@ export default function App() {
           <MyReservations
             // The reservations state is already scoped to the current user via loadUserReservations()
             reservations={reservations}
+            rooms={rooms}
             onCancel={handleCancelReservation}
           />
         )}
