@@ -21,7 +21,6 @@ import {
   MoreHorizontal,
 } from 'lucide-react';
 import type { Room, Reservation } from '../App';
-import { formatPricePerHour } from '../lib/pricing';
 
 type DashboardProps = {
   rooms: Room[];
@@ -157,9 +156,6 @@ export function Dashboard({ rooms, reservations, onSelectRoom, initialLocation =
                       <MapPin className="w-3 h-3" />
                       {room.location}
                     </CardDescription>
-                    {room.pricePerHour !== undefined && (
-                      <div className="mt-1 text-sm text-foreground">{formatPricePerHour(room.pricePerHour)}</div>
-                    )}
                   </div>
                   {room.available ? (
                     <Badge className="bg-green-500/10 text-green-600 border-green-500/30" variant="outline">

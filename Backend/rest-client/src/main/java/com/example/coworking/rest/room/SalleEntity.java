@@ -1,7 +1,6 @@
 package com.example.coworking.rest.room;
 
 import javax.persistence.*;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,9 +26,6 @@ public class SalleEntity {
     @Column(nullable = false)
     private Boolean available = true; // use wrapper to avoid NPE if legacy rows are NULL
 
-    @Column(name = "price_per_hour", precision = 10, scale = 2)
-    private BigDecimal pricePerHour;
-
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "room_amenities", joinColumns = @JoinColumn(name = "room_id"))
     @Column(name = "name", length = 60)
@@ -49,7 +45,4 @@ public class SalleEntity {
     public void setAvailable(Boolean available) { this.available = available; }
     public List<String> getAmenities() { return amenities; }
     public void setAmenities(List<String> amenities) { this.amenities = amenities; }
-
-    public BigDecimal getPricePerHour() { return pricePerHour; }
-    public void setPricePerHour(BigDecimal pricePerHour) { this.pricePerHour = pricePerHour; }
 }

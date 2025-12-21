@@ -9,7 +9,6 @@ type RoomDTO = {
   amenities?: string[];
   imageUrl?: string;
   available: boolean;
-  pricePerHour?: number | string;
 };
 
 export async function listRooms(): Promise<Room[]> {
@@ -25,7 +24,6 @@ export async function listRooms(): Promise<Room[]> {
         d.imageUrl ||
         'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80',
       available: typeof d.available === 'boolean' ? d.available : true,
-      pricePerHour: d.pricePerHour !== undefined && d.pricePerHour !== null ? Number(d.pricePerHour) : undefined,
     }));
   } catch (primaryErr) {
     console.warn('[rooms] /api/rooms failed, falling back to /api/salles', primaryErr);
@@ -41,7 +39,6 @@ export async function listRooms(): Promise<Room[]> {
         d.imageUrl ||
         'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80',
       available: typeof d.available === 'boolean' ? d.available : true,
-      pricePerHour: d.pricePerHour !== undefined && d.pricePerHour !== null ? Number(d.pricePerHour) : undefined,
     }));
   }
 }
@@ -62,7 +59,6 @@ export async function createRoom(payload: UpsertRoomInput): Promise<Room> {
     amenities: dto.amenities ?? [],
     imageUrl: dto.imageUrl || '',
     available: dto.available,
-    pricePerHour: dto.pricePerHour !== undefined && dto.pricePerHour !== null ? Number(dto.pricePerHour) : undefined,
   };
 }
 
@@ -80,7 +76,6 @@ export async function updateRoom(id: string, payload: Partial<UpsertRoomInput>):
     amenities: dto.amenities ?? [],
     imageUrl: dto.imageUrl || '',
     available: dto.available,
-    pricePerHour: dto.pricePerHour !== undefined && dto.pricePerHour !== null ? Number(dto.pricePerHour) : undefined,
   };
 }
 

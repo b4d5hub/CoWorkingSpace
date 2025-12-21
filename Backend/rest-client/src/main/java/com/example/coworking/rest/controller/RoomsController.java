@@ -46,9 +46,6 @@ public class RoomsController {
             jdbcTemplate.execute("ALTER TABLE salles ADD COLUMN available TINYINT(1) NOT NULL DEFAULT 1");
         } catch (Exception ignored) {}
         try {
-            jdbcTemplate.execute("ALTER TABLE salles ADD COLUMN price_per_hour DECIMAL(10,2)");
-        } catch (Exception ignored) {}
-        try {
             jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS room_amenities (" +
                     "room_id BIGINT NOT NULL, " +
                     "name VARCHAR(60) NOT NULL, " +
@@ -129,7 +126,6 @@ public class RoomsController {
         private List<String> amenities;
         private String imageUrl;
         private boolean available;
-        private java.math.BigDecimal pricePerHour;
 
         public Long getId() { return id; }
         public void setId(Long id) { this.id = id; }
@@ -145,8 +141,6 @@ public class RoomsController {
         public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
         public boolean isAvailable() { return available; }
         public void setAvailable(boolean available) { this.available = available; }
-        public java.math.BigDecimal getPricePerHour() { return pricePerHour; }
-        public void setPricePerHour(java.math.BigDecimal pricePerHour) { this.pricePerHour = pricePerHour; }
     }
 
     @GetMapping
@@ -171,7 +165,6 @@ public class RoomsController {
                     boolean available = true;
                     try { available = (rs.getObject("available") == null) ? true : rs.getBoolean("available"); } catch (Exception ignore) {}
                     dto.setAvailable(available);
-                    try { dto.setPricePerHour(rs.getBigDecimal("price_per_hour")); } catch (Exception ignore) { dto.setPricePerHour(null); }
                     dto.setAmenities(new ArrayList<>());
                     return dto;
                 }
@@ -212,7 +205,6 @@ public class RoomsController {
                     boolean available = true;
                     try { available = (rs.getObject("available") == null) ? true : rs.getBoolean("available"); } catch (Exception ignore) {}
                     dto.setAvailable(available);
-                    try { dto.setPricePerHour(rs.getBigDecimal("price_per_hour")); } catch (Exception ignore) { dto.setPricePerHour(null); }
                     return dto;
                 }
         );
@@ -238,7 +230,6 @@ public class RoomsController {
         public List<String> amenities;
         public String imageUrl;
         public Boolean available;
-        public java.math.BigDecimal pricePerHour;
     }
 
     @PostMapping
@@ -250,14 +241,13 @@ public class RoomsController {
         // Insert with reliable generated key retrieval on the same connection
         Long id = jdbcTemplate.execute((java.sql.Connection con) -> {
             try (PreparedStatement ps = con.prepareStatement(
-                    "INSERT INTO salles(nom, capacite, location, image_url, available, price_per_hour) VALUES (?,?,?,?,?,?)",
+                    "INSERT INTO salles(nom, capacite, location, image_url, available) VALUES (?,?,?,?,?)",
                     java.sql.Statement.RETURN_GENERATED_KEYS)) {
                 ps.setString(1, req.name);
                 ps.setInt(2, req.capacity);
                 ps.setString(3, req.location);
                 ps.setString(4, req.imageUrl);
                 ps.setBoolean(5, req.available == null ? true : req.available);
-                if (req.pricePerHour != null) ps.setBigDecimal(6, req.pricePerHour); else ps.setNull(6, java.sql.Types.DECIMAL);
                 ps.executeUpdate();
                 try (java.sql.ResultSet rs = ps.getGeneratedKeys()) {
                     if (rs != null && rs.next()) return rs.getLong(1);
@@ -287,7 +277,6 @@ public class RoomsController {
         dto.setAmenities(req.amenities);
         dto.setImageUrl(req.imageUrl);
         dto.setAvailable(req.available == null ? true : req.available);
-        dto.setPricePerHour(req.pricePerHour);
         return ResponseEntity.status(HttpStatus.CREATED).body(dto);
     }
 
@@ -306,7 +295,6 @@ public class RoomsController {
         if (req.location != null) { sql.append(first?"":" ,").append("location=?"); params.add(req.location); first=false; }
         if (req.imageUrl != null) { sql.append(first?"":" ,").append("image_url=?"); params.add(req.imageUrl); first=false; }
         if (req.available != null) { sql.append(first?"":" ,").append("available=?"); params.add(req.available); first=false; }
-        if (req.pricePerHour != null) { sql.append(first?"":" ,").append("price_per_hour=?"); params.add(req.pricePerHour); first=false; }
         sql.append(" WHERE id=?"); params.add(id);
         if (!first) jdbcTemplate.update(sql.toString(), params.toArray());
         // Update amenities if provided

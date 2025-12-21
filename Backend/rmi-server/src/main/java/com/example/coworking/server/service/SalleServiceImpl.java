@@ -18,7 +18,6 @@ import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.math.BigDecimal;
 
 @Service("salleServiceImpl")
 public class SalleServiceImpl implements SalleService {
@@ -31,55 +30,41 @@ public class SalleServiceImpl implements SalleService {
 
         // Seed some data if empty
         if (salleRepository.count() == 0) {
-            Salle s1 = new Salle(
+            salleRepository.save(new Salle(
                     "Innovation Hub", 8,
                     "Agadir",
                     "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80",
                     true,
                     Arrays.asList("Projector", "Whiteboard", "Video Conference")
-            );
-            s1.setPricePerHour(new BigDecimal("80.00"));
-            salleRepository.save(s1);
-
-            Salle s2 = new Salle(
+            ));
+            salleRepository.save(new Salle(
                     "Executive Suite", 12,
                     "Agadir",
                     "https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=800&q=80",
                     false,
                     Arrays.asList("TV Screen", "Premium Chairs", "Coffee Machine")
-            );
-            s2.setPricePerHour(new BigDecimal("120.00"));
-            salleRepository.save(s2);
-
-            Salle s3 = new Salle(
+            ));
+            salleRepository.save(new Salle(
                     "Collaboration Space", 6,
                     "Marrakech",
                     "https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=800&q=80",
                     true,
                     Arrays.asList("Whiteboard", "Video Conference", "Standing Desk")
-            );
-            s3.setPricePerHour(new BigDecimal("60.00"));
-            salleRepository.save(s3);
-
-            Salle s4 = new Salle(
+            ));
+            salleRepository.save(new Salle(
                     "Creative Studio", 10,
                     "Marrakech",
                     "https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=800&q=80",
                     true,
                     Arrays.asList("Smart TV", "Drawing Board", "Bean Bags")
-            );
-            s4.setPricePerHour(new BigDecimal("95.00"));
-            salleRepository.save(s4);
-
-            Salle s5 = new Salle(
+            ));
+            salleRepository.save(new Salle(
                     "Boardroom Prime", 16,
                     "Casablanca",
                     "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&q=80",
                     false,
                     Arrays.asList("Conference Phone", "Dual Monitors", "Executive Chairs")
-            );
-            s5.setPricePerHour(new BigDecimal("150.00"));
-            salleRepository.save(s5);
+            ));
         }
     }
 
@@ -94,8 +79,7 @@ public class SalleServiceImpl implements SalleService {
                         s.getCapacite(),
                         s.getAmenities(),
                         s.getImageUrl(),
-                        s.isAvailable(),
-                        s.getPricePerHour()
+                        s.isAvailable()
                 ))
                 .collect(Collectors.toList());
     }

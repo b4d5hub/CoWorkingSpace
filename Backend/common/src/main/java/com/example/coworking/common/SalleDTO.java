@@ -1,7 +1,6 @@
 package com.example.coworking.common;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -15,7 +14,6 @@ public class SalleDTO implements Serializable {
     private List<String> amenities;
     private String imageUrl;
     private boolean available;
-    private BigDecimal pricePerHour;
 
     public SalleDTO() {}
 
@@ -27,17 +25,6 @@ public class SalleDTO implements Serializable {
         this.amenities = amenities;
         this.imageUrl = imageUrl;
         this.available = available;
-    }
-
-    public SalleDTO(Long id, String name, String location, int capacity, List<String> amenities, String imageUrl, boolean available, BigDecimal pricePerHour) {
-        this.id = id;
-        this.name = name;
-        this.location = location;
-        this.capacity = capacity;
-        this.amenities = amenities;
-        this.imageUrl = imageUrl;
-        this.available = available;
-        this.pricePerHour = pricePerHour;
     }
 
     public Long getId() { return id; }
@@ -60,7 +47,4 @@ public class SalleDTO implements Serializable {
 
     public boolean isAvailable() { return available; }
     public void setAvailable(boolean available) { this.available = available; }
-
-    public BigDecimal getPricePerHour() { return pricePerHour; }
-    public void setPricePerHour(BigDecimal pricePerHour) { this.pricePerHour = pricePerHour; }
 }

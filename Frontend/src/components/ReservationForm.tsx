@@ -7,7 +7,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Badge } from './ui/badge';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Calendar, Clock, MapPin, Users, CheckCircle2, XCircle } from 'lucide-react';
-import { calculateHours, calculateTotalPrice, formatMoney, formatPricePerHour } from '../lib/pricing';
 import type { Room, User, Reservation } from '../App';
 
 type ReservationFormProps = {
@@ -96,29 +95,15 @@ export function ReservationForm({ room, user, onConfirm, onCancel }: Reservation
                 <span className="text-sm text-muted-foreground">Time:</span>
                 <span className="text-sm text-foreground">{startTime} - {endTime}</span>
               </div>
-            </div>
-
-            {/* Pricing breakdown on confirmation */}
-            <div className="space-y-3">
               <div className="flex items-start justify-between p-3 bg-muted rounded-sm border border-border">
-                <span className="text-sm text-muted-foreground">Price per hour:</span>
-                <span className="text-sm text-foreground">{formatPricePerHour(room.pricePerHour)}</span>
-              </div>
-              <div className="flex items-start justify-between p-3 bg-muted rounded-sm border border-border">
-                <span className="text-sm text-muted-foreground">Duration (hours):</span>
-                <span className="text-sm text-foreground">{formatMoney(calculateHours(startTime, endTime))}</span>
-              </div>
-              <div className="flex items-start justify-between p-3 bg-muted rounded-sm border border-border">
-                <span className="text-sm text-muted-foreground">Total:</span>
-                <span className="text-sm text-foreground font-medium">
-                  {formatMoney(calculateTotalPrice(room.pricePerHour, calculateHours(startTime, endTime)))}
-                </span>
+                <span className="text-sm text-muted-foreground">Booked by:</span>
+                <span className="text-sm text-foreground">{user.name}</span>
               </div>
             </div>
 
             <div className="p-4 bg-muted border border-border rounded-sm">
               <p className="text-sm text-foreground">
-                  You will receive a confirmation once your reservation is finalized.
+                Your reservation will be synchronized across all RMI servers in the distributed system.
               </p>
             </div>
 
@@ -257,23 +242,6 @@ export function ReservationForm({ room, user, onConfirm, onCancel }: Reservation
               </div>
 
               <div className="pt-4 border-t border-border">
-                {/* Live pricing breakdown while selecting time */}
-                <div className="space-y-2 mb-4">
-                  <div className="flex items-start justify-between p-3 bg-muted rounded-sm border border-border">
-                    <span className="text-sm text-muted-foreground">Price per hour</span>
-                    <span className="text-sm text-foreground">{formatPricePerHour(room.pricePerHour)}</span>
-                  </div>
-                  <div className="flex items-start justify-between p-3 bg-muted rounded-sm border border-border">
-                    <span className="text-sm text-muted-foreground">Hours</span>
-                    <span className="text-sm text-foreground">{formatMoney(calculateHours(startTime, endTime))}</span>
-                  </div>
-                  <div className="flex items-start justify-between p-3 bg-muted rounded-sm border border-border">
-                    <span className="text-sm text-muted-foreground">Total</span>
-                    <span className="text-sm text-foreground font-medium">
-                      {formatMoney(calculateTotalPrice(room.pricePerHour, calculateHours(startTime, endTime)))}
-                    </span>
-                  </div>
-                </div>
                 <div className="flex items-start gap-2 p-3 bg-muted rounded-sm mb-4 border border-border">
                   <div className="text-sm text-foreground">
                     <p>Reservation will be checked for conflicts across all branch servers.</p>

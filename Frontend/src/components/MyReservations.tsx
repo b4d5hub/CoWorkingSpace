@@ -21,16 +21,14 @@ import {
   AlertDialogTrigger,
 } from './ui/alert-dialog';
 import { Calendar, Clock, MapPin, XCircle, CheckCircle2 } from 'lucide-react';
-import type { Reservation, Room } from '../App';
-import { calculateHours, calculateTotalPrice, formatMoney, formatPricePerHour } from '../lib/pricing';
+import type { Reservation } from '../App';
 
 type MyReservationsProps = {
   reservations: Reservation[];
-  rooms?: Room[];
   onCancel: (reservationId: string) => void;
 };
 
-export function MyReservations({ reservations, rooms = [], onCancel }: MyReservationsProps) {
+export function MyReservations({ reservations, onCancel }: MyReservationsProps) {
   const activeReservations = reservations.filter((r) => r.status === 'confirmed');
   const cancelledReservations = reservations.filter((r) => r.status === 'cancelled');
 
@@ -87,7 +85,6 @@ export function MyReservations({ reservations, rooms = [], onCancel }: MyReserva
                       <TableHead>Location</TableHead>
                       <TableHead>Date</TableHead>
                       <TableHead>Time</TableHead>
-                      <TableHead>Pricing</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead>Actions</TableHead>
                     </TableRow>
@@ -113,23 +110,6 @@ export function MyReservations({ reservations, rooms = [], onCancel }: MyReserva
                             <Clock className="w-3 h-3 text-gray-400" />
                             {(reservation.startTime || '-')}{reservation.endTime ? ` - ${reservation.endTime}` : ''}
                           </div>
-                        </TableCell>
-                        <TableCell>
-                          {(() => {
-                            const room = rooms.find((r) => r.id === reservation.roomId);
-                            const hours = calculateHours(reservation.startTime, reservation.endTime);
-                            const total = calculateTotalPrice(room?.pricePerHour, hours);
-                            if (!room?.pricePerHour) {
-                              return <span className="text-muted-foreground">N/A</span>;
-                            }
-                            return (
-                              <div className="text-sm text-foreground">
-                                <div>Price/hr: {formatPricePerHour(room.pricePerHour)}</div>
-                                <div>Hours: {formatMoney(hours)}</div>
-                                <div className="font-medium">Total: {formatMoney(total)}</div>
-                              </div>
-                            );
-                          })()}
                         </TableCell>
                         <TableCell>
                           <Badge
@@ -215,28 +195,6 @@ export function MyReservations({ reservations, rooms = [], onCancel }: MyReserva
                         <Clock className="w-4 h-4 text-gray-400" />
                         {(reservation.startTime || '-')}{reservation.endTime ? ` - ${reservation.endTime}` : ''}
                       </div>
-                      {/* Pricing breakdown (mobile) */}
-                      {(() => {
-                        const room = rooms.find((r) => r.id === reservation.roomId);
-                        const hours = calculateHours(reservation.startTime, reservation.endTime);
-                        const total = calculateTotalPrice(room?.pricePerHour, hours);
-                        return (
-                          <div className="mt-2 p-3 bg-muted rounded-sm border border-border text-sm">
-                            <div className="flex items-center justify-between">
-                              <span className="text-muted-foreground">Price/hr</span>
-                              <span className="text-foreground">{formatPricePerHour(room?.pricePerHour)}</span>
-                            </div>
-                            <div className="flex items-center justify-between">
-                              <span className="text-muted-foreground">Hours</span>
-                              <span className="text-foreground">{formatMoney(hours)}</span>
-                            </div>
-                            <div className="flex items-center justify-between">
-                              <span className="text-muted-foreground">Total</span>
-                              <span className="text-foreground font-medium">{formatMoney(total)}</span>
-                            </div>
-                          </div>
-                        );
-                      })()}
                       {isUpcoming(reservation.date) && (
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
