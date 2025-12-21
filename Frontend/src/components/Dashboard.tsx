@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
@@ -28,17 +28,12 @@ type DashboardProps = {
   reservations: Reservation[];
   onSelectRoom: (room: Room) => void;
   initialLocation?: string;
-  onLocationChange?: (location: string) => void;
 };
 
-export function Dashboard({ rooms, reservations, onSelectRoom, initialLocation = 'all', onLocationChange }: DashboardProps) {
+export function Dashboard({ rooms, reservations, onSelectRoom, initialLocation = 'all' }: DashboardProps) {
   const [selectedLocation, setSelectedLocation] = useState<string>(initialLocation);
   const [selectedCapacity, setSelectedCapacity] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
-
-  useEffect(() => {
-    setSelectedLocation(initialLocation);
-  }, [initialLocation]);
 
   const locations = ['all', ...Array.from(new Set(rooms.map((room) => room.location)))];
 
@@ -106,7 +101,7 @@ export function Dashboard({ rooms, reservations, onSelectRoom, initialLocation =
             </div>
             <div className="space-y-2">
               <label className="text-sm text-foreground">Location</label>
-              <Select value={selectedLocation} onValueChange={(val) => { setSelectedLocation(val); onLocationChange?.(val); }}>
+              <Select value={selectedLocation} onValueChange={setSelectedLocation}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select location" />
                 </SelectTrigger>
