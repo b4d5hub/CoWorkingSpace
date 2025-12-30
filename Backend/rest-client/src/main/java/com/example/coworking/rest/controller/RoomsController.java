@@ -13,6 +13,8 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.math.BigDecimal;
+import java.sql.Types;
 
 @RestController
 @RequestMapping("/api/rooms")
@@ -52,6 +54,10 @@ public class RoomsController {
                     "PRIMARY KEY (room_id, name), " +
                     "CONSTRAINT fk_room_amenities_room FOREIGN KEY (room_id) REFERENCES salles(id) ON DELETE CASCADE" +
                     ")");
+        } catch (Exception ignored) {}
+        // Ensure optional pricing column exists
+        try {
+            jdbcTemplate.execute("ALTER TABLE salles ADD COLUMN price_per_hour DECIMAL(10,2) NULL");
         } catch (Exception ignored) {}
     }
 
@@ -126,6 +132,8 @@ public class RoomsController {
         private List<String> amenities;
         private String imageUrl;
         private boolean available;
+        // Optional hourly price; null means not set
+        private BigDecimal pricePerHour;
 
         public Long getId() { return id; }
         public void setId(Long id) { this.id = id; }
@@ -141,6 +149,8 @@ public class RoomsController {
         public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
         public boolean isAvailable() { return available; }
         public void setAvailable(boolean available) { this.available = available; }
+        public BigDecimal getPricePerHour() { return pricePerHour; }
+        public void setPricePerHour(BigDecimal pricePerHour) { this.pricePerHour = pricePerHour; }
     }
 
     @GetMapping
@@ -162,6 +172,7 @@ public class RoomsController {
                     }
                     try { dto.setLocation(rs.getString("location")); } catch (Exception ignore) { dto.setLocation(null); }
                     try { dto.setImageUrl(rs.getString("image_url")); } catch (Exception ignore) { dto.setImageUrl(null); }
+                    try { dto.setPricePerHour(rs.getBigDecimal("price_per_hour")); } catch (Exception ignore) { dto.setPricePerHour(null); }
                     boolean available = true;
                     try { available = (rs.getObject("available") == null) ? true : rs.getBoolean("available"); } catch (Exception ignore) {}
                     dto.setAvailable(available);
@@ -205,6 +216,7 @@ public class RoomsController {
                     boolean available = true;
                     try { available = (rs.getObject("available") == null) ? true : rs.getBoolean("available"); } catch (Exception ignore) {}
                     dto.setAvailable(available);
+                    try { dto.setPricePerHour(rs.getBigDecimal("price_per_hour")); } catch (Exception ignore) { dto.setPricePerHour(null); }
                     return dto;
                 }
         );
@@ -230,6 +242,8 @@ public class RoomsController {
         public List<String> amenities;
         public String imageUrl;
         public Boolean available;
+        // Optional hourly price; null means unset; 0 is valid
+        public BigDecimal pricePerHour;
     }
 
     @PostMapping
@@ -241,13 +255,14 @@ public class RoomsController {
         // Insert with reliable generated key retrieval on the same connection
         Long id = jdbcTemplate.execute((java.sql.Connection con) -> {
             try (PreparedStatement ps = con.prepareStatement(
-                    "INSERT INTO salles(nom, capacite, location, image_url, available) VALUES (?,?,?,?,?)",
+                    "INSERT INTO salles(nom, capacite, location, image_url, available, price_per_hour) VALUES (?,?,?,?,?,?)",
                     java.sql.Statement.RETURN_GENERATED_KEYS)) {
                 ps.setString(1, req.name);
                 ps.setInt(2, req.capacity);
                 ps.setString(3, req.location);
                 ps.setString(4, req.imageUrl);
                 ps.setBoolean(5, req.available == null ? true : req.available);
+                if (req.pricePerHour == null) ps.setNull(6, Types.DECIMAL); else ps.setBigDecimal(6, req.pricePerHour);
                 ps.executeUpdate();
                 try (java.sql.ResultSet rs = ps.getGeneratedKeys()) {
                     if (rs != null && rs.next()) return rs.getLong(1);
@@ -277,6 +292,7 @@ public class RoomsController {
         dto.setAmenities(req.amenities);
         dto.setImageUrl(req.imageUrl);
         dto.setAvailable(req.available == null ? true : req.available);
+        dto.setPricePerHour(req.pricePerHour);
         return ResponseEntity.status(HttpStatus.CREATED).body(dto);
     }
 
@@ -295,6 +311,7 @@ public class RoomsController {
         if (req.location != null) { sql.append(first?"":" ,").append("location=?"); params.add(req.location); first=false; }
         if (req.imageUrl != null) { sql.append(first?"":" ,").append("image_url=?"); params.add(req.imageUrl); first=false; }
         if (req.available != null) { sql.append(first?"":" ,").append("available=?"); params.add(req.available); first=false; }
+        if (req.pricePerHour != null) { sql.append(first?"":" ,").append("price_per_hour=?"); params.add(req.pricePerHour); first=false; }
         sql.append(" WHERE id=?"); params.add(id);
         if (!first) jdbcTemplate.update(sql.toString(), params.toArray());
         // Update amenities if provided

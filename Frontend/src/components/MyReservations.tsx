@@ -21,14 +21,16 @@ import {
   AlertDialogTrigger,
 } from './ui/alert-dialog';
 import { Calendar, Clock, MapPin, XCircle, CheckCircle2 } from 'lucide-react';
-import type { Reservation } from '../App';
+import type { Reservation, Room } from '../App';
+import { diffHours, formatPrice, calculateTotalPrice } from '../lib/pricing';
 
 type MyReservationsProps = {
   reservations: Reservation[];
+  rooms: Room[];
   onCancel: (reservationId: string) => void;
 };
 
-export function MyReservations({ reservations, onCancel }: MyReservationsProps) {
+export function MyReservations({ reservations, rooms, onCancel }: MyReservationsProps) {
   const activeReservations = reservations.filter((r) => r.status === 'confirmed');
   const cancelledReservations = reservations.filter((r) => r.status === 'cancelled');
 
@@ -51,6 +53,14 @@ export function MyReservations({ reservations, onCancel }: MyReservationsProps) 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     return d >= today;
+  };
+
+  // Build a quick lookup from room id to room (to access pricePerHour)
+  const roomsById: Record<string, Room> = Object.fromEntries(rooms.map(r => [r.id, r]));
+
+  const getPricePerHourFor = (reservation: Reservation): number | undefined => {
+    const room = roomsById[reservation.roomId] || null;
+    return room ? room.pricePerHour : undefined;
   };
 
   return (
@@ -109,6 +119,18 @@ export function MyReservations({ reservations, onCancel }: MyReservationsProps) 
                           <div className="flex items-center gap-1">
                             <Clock className="w-3 h-3 text-gray-400" />
                             {(reservation.startTime || '-')}{reservation.endTime ? ` - ${reservation.endTime}` : ''}
+                          </div>
+                          {/* Pricing/duration summary with computed totals when price is available */}
+                          <div className="text-xs text-muted-foreground mt-1">
+                            {(() => {
+                              const hrs = diffHours(reservation.startTime, reservation.endTime);
+                              const p = getPricePerHourFor(reservation);
+                              const breakdown = calculateTotalPrice(p, reservation.startTime, reservation.endTime);
+                              const hoursText = hrs ?? '-';
+                              const priceText = typeof p === 'number' ? `${formatPrice(p)} / hr` : 'N/A';
+                              const totalText = breakdown ? `${formatPrice(breakdown.total)}` : 'N/A';
+                              return `Hours: ${hoursText} | Price/hr: ${priceText} | Total: ${totalText}`;
+                            })()}
                           </div>
                         </TableCell>
                         <TableCell>
@@ -194,6 +216,18 @@ export function MyReservations({ reservations, onCancel }: MyReservationsProps) 
                       <div className="flex items-center gap-2 text-sm text-gray-700">
                         <Clock className="w-4 h-4 text-gray-400" />
                         {(reservation.startTime || '-')}{reservation.endTime ? ` - ${reservation.endTime}` : ''}
+                      </div>
+                      {/* Pricing/duration summary with computed totals when price is available (mobile) */}
+                      <div className="text-xs text-muted-foreground">
+                        {(() => {
+                          const hrs = diffHours(reservation.startTime, reservation.endTime);
+                          const p = getPricePerHourFor(reservation);
+                          const breakdown = calculateTotalPrice(p, reservation.startTime, reservation.endTime);
+                          const hoursText = hrs ?? '-';
+                          const priceText = typeof p === 'number' ? `${formatPrice(p)} / hr` : 'N/A';
+                          const totalText = breakdown ? `${formatPrice(breakdown.total)}` : 'N/A';
+                          return `Hours: ${hoursText} | Price/hr: ${priceText} | Total: ${totalText}`;
+                        })()}
                       </div>
                       {isUpcoming(reservation.date) && (
                         <AlertDialog>
