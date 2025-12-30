@@ -23,6 +23,9 @@ public class SalleEntity {
     @Column(name = "image_url", length = 512)
     private String imageUrl;
 
+    @Column(name = "price_per_hour", precision = 10, scale = 2)
+    private java.math.BigDecimal pricePerHour;
+
     @Column(nullable = false)
     private Boolean available = true; // use wrapper to avoid NPE if legacy rows are NULL
 
@@ -40,6 +43,8 @@ public class SalleEntity {
     public void setLocation(String location) { this.location = location; }
     public String getImageUrl() { return imageUrl; }
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+    public java.math.BigDecimal getPricePerHour() { return pricePerHour; }
+    public void setPricePerHour(java.math.BigDecimal pricePerHour) { this.pricePerHour = pricePerHour; }
     public boolean isAvailable() { return Boolean.TRUE.equals(available); }
     public void setAvailable(boolean available) { this.available = available; }
     public void setAvailable(Boolean available) { this.available = available; }
