@@ -46,6 +46,9 @@ public class RoomsController {
             jdbcTemplate.execute("ALTER TABLE salles ADD COLUMN available TINYINT(1) NOT NULL DEFAULT 1");
         } catch (Exception ignored) {}
         try {
+            jdbcTemplate.execute("ALTER TABLE salles ADD COLUMN price_per_hour DECIMAL(10,2)");
+        } catch (Exception ignored) {}
+        try {
             jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS room_amenities (" +
                     "room_id BIGINT NOT NULL, " +
                     "name VARCHAR(60) NOT NULL, " +
@@ -126,6 +129,7 @@ public class RoomsController {
         private List<String> amenities;
         private String imageUrl;
         private boolean available;
+        private java.math.BigDecimal pricePerHour;
 
         public Long getId() { return id; }
         public void setId(Long id) { this.id = id; }
@@ -141,6 +145,8 @@ public class RoomsController {
         public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
         public boolean isAvailable() { return available; }
         public void setAvailable(boolean available) { this.available = available; }
+        public java.math.BigDecimal getPricePerHour() { return pricePerHour; }
+        public void setPricePerHour(java.math.BigDecimal pricePerHour) { this.pricePerHour = pricePerHour; }
     }
 
     @GetMapping
