@@ -1,7 +1,9 @@
 import { Button } from './ui/button';
-import { Building2, Calendar, LayoutDashboard, LogOut, Shield, User as UserIcon } from 'lucide-react';
+import { Building2, Calendar, LayoutDashboard, LogOut, Shield, User as UserIcon, Moon, Sun } from 'lucide-react';
 import type { User } from '../App';
 import type { Page } from '../App';
+
+import { useTheme } from "../theme/ThemeContext";
 
 type NavbarProps = {
   user: User | null;
@@ -11,6 +13,7 @@ type NavbarProps = {
 };
 
 export function Navbar({ user, currentPage, onNavigate, onLogout }: NavbarProps) {
+  const { theme, toggleTheme } = useTheme();
   return (
     <nav className="bg-background border-b border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -54,6 +57,20 @@ export function Navbar({ user, currentPage, onNavigate, onLogout }: NavbarProps)
           </div>
 
           <div className="flex items-center gap-4">
+            <Button
+              variant="ghost"
+              onClick={toggleTheme}
+              aria-pressed={theme === 'darkBlue'}
+              title={theme === 'darkBlue' ? 'Switch to Light Mode' : 'Switch to Dark Blue Mode'}
+              className="text-foreground hover:text-foreground/70"
+            >
+              {theme === 'darkBlue' ? (
+                <Sun className="w-4 h-4" />
+              ) : (
+                <Moon className="w-4 h-4" />
+              )}
+            </Button>
+            
             <Button
               variant="ghost"
               onClick={() => onNavigate('profile')}
