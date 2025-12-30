@@ -36,6 +36,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Plus, Pencil, Trash2, Users, MapPin, ArrowLeft, Server } from 'lucide-react';
 import type { Room } from '../App';
 import { toast } from 'sonner@2.0.3';
+import { formatPrice } from '../lib/pricing';
 
 type AdminRoomsProps = {
   rooms: Room[];
@@ -56,6 +57,8 @@ export function AdminRooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom, onBack 
   const [formAmenities, setFormAmenities] = useState('');
   const [formImageUrl, setFormImageUrl] = useState('');
   const [formAvailable, setFormAvailable] = useState('true');
+  // Optional per-hour pricing input (frontend only)
+  const [formPricePerHour, setFormPricePerHour] = useState<string>('');
 
   const resetForm = () => {
     setFormName('');
@@ -64,18 +67,21 @@ export function AdminRooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom, onBack 
     setFormAmenities('');
     setFormImageUrl('');
     setFormAvailable('true');
+    setFormPricePerHour('');
   };
 
   const handleAddRoom = (e: React.FormEvent) => {
     e.preventDefault();
+    const price = formPricePerHour.trim() === '' ? undefined : Math.max(0, Number(formPricePerHour));
     onAddRoom({
       name: formName,
       location: formLocation,
       capacity: parseInt(formCapacity),
-      amenities: formAmenities.split(',').map((a) => a.trim()),
+      amenities: formAmenities.split(',').map((a) => a.trim()).filter(Boolean),
       imageUrl:
         formImageUrl || 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80',
       available: formAvailable === 'true',
+      pricePerHour: isNaN(Number(price)) ? undefined : (price as number),
     });
     toast.success('Room added successfully', {
       description: `RMI server synchronized: ${formLocation}`,
@@ -87,13 +93,15 @@ export function AdminRooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom, onBack 
   const handleEditRoom = (e: React.FormEvent) => {
     e.preventDefault();
     if (editingRoom) {
+      const price = formPricePerHour.trim() === '' ? undefined : Math.max(0, Number(formPricePerHour));
       onEditRoom(editingRoom.id, {
         name: formName,
         location: formLocation,
         capacity: parseInt(formCapacity),
-        amenities: formAmenities.split(',').map((a) => a.trim()),
+        amenities: formAmenities.split(',').map((a) => a.trim()).filter(Boolean),
         imageUrl: formImageUrl,
         available: formAvailable === 'true',
+        pricePerHour: isNaN(Number(price)) ? undefined : (price as number),
       });
       toast.success('Room updated successfully', {
         description: `Changes synchronized across all RMI servers`,
@@ -111,6 +119,7 @@ export function AdminRooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom, onBack 
     setFormAmenities(room.amenities.join(', '));
     setFormImageUrl(room.imageUrl);
     setFormAvailable(room.available ? 'true' : 'false');
+    setFormPricePerHour(typeof room.pricePerHour === 'number' ? String(room.pricePerHour) : '');
   };
 
   const handleDelete = (roomId: string, roomName: string) => {
@@ -197,6 +206,20 @@ export function AdminRooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom, onBack 
                       />
                     </div>
                     <div className="space-y-2">
+                      <Label htmlFor="pricePerHour">Price per hour (optional)</Label>
+                      <Input
+                        id="pricePerHour"
+                        type="number"
+                        inputMode="decimal"
+                        step="0.01"
+                        min="0"
+                        value={formPricePerHour}
+                        onChange={(e) => setFormPricePerHour(e.target.value)}
+                        placeholder="e.g., 49.99"
+                      />
+                      <p className="text-xs text-muted-foreground">Leave empty if this room has no hourly pricing.</p>
+                    </div>
+                    <div className="space-y-2">
                       <Label htmlFor="amenities">Equipment (comma-separated)</Label>
                       <Input
                         id="amenities"
@@ -256,6 +279,7 @@ export function AdminRooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom, onBack 
                   <TableHead className="text-muted-foreground">Room Name</TableHead>
                   <TableHead className="text-muted-foreground">Branch</TableHead>
                   <TableHead className="text-muted-foreground">Capacity</TableHead>
+                  <TableHead className="text-muted-foreground">Price / hr</TableHead>
                   <TableHead className="text-muted-foreground">Equipment</TableHead>
                   <TableHead className="text-muted-foreground">Status</TableHead>
                   <TableHead className="text-muted-foreground">Actions</TableHead>
@@ -277,6 +301,11 @@ export function AdminRooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom, onBack 
                         <Users className="w-3 h-3 text-foreground" />
                         <span className="text-foreground">{room.capacity}</span>
                       </div>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-foreground text-sm">
+                        {typeof room.pricePerHour === 'number' ? `${formatPrice(room.pricePerHour)} / hr` : 'N/A'}
+                      </span>
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-wrap gap-1">
@@ -371,6 +400,20 @@ export function AdminRooms({ rooms, onAddRoom, onEditRoom, onDeleteRoom, onBack 
                                     min="1"
                                     required
                                   />
+                                </div>
+                                <div className="space-y-2">
+                                  <Label htmlFor="edit-pricePerHour">Price per hour (optional)</Label>
+                                  <Input
+                                    id="edit-pricePerHour"
+                                    type="number"
+                                    inputMode="decimal"
+                                    step="0.01"
+                                    min="0"
+                                    value={formPricePerHour}
+                                    onChange={(e) => setFormPricePerHour(e.target.value)}
+                                    placeholder="e.g., 49.99"
+                                  />
+                                  <p className="text-xs text-muted-foreground">Leave empty if this room has no hourly pricing.</p>
                                 </div>
                                 <div className="space-y-2">
                                   <Label htmlFor="edit-amenities">

@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Badge } from './ui/badge';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Calendar, Clock, MapPin, Users, CheckCircle2, XCircle } from 'lucide-react';
+import { calculateTotalPrice, diffHours, formatPrice } from '../lib/pricing';
 import type { Room, User, Reservation } from '../App';
 
 type ReservationFormProps = {
@@ -94,6 +95,22 @@ export function ReservationForm({ room, user, onConfirm, onCancel }: Reservation
               <div className="flex items-start justify-between p-3 bg-muted rounded-sm border border-border">
                 <span className="text-sm text-muted-foreground">Time:</span>
                 <span className="text-sm text-foreground">{startTime} - {endTime}</span>
+              </div>
+              {/* Pricing breakdown on confirmation */}
+              <div className="flex items-start justify-between p-3 bg-muted rounded-sm border border-border">
+                <span className="text-sm text-muted-foreground">Price per hour:</span>
+                <span className="text-sm text-foreground">{room.pricePerHour != null ? `${formatPrice(room.pricePerHour)} / hr` : 'N/A'}</span>
+              </div>
+              <div className="flex items-start justify-between p-3 bg-muted rounded-sm border border-border">
+                <span className="text-sm text-muted-foreground">Duration:</span>
+                <span className="text-sm text-foreground">{diffHours(startTime, endTime) ?? '-'} {diffHours(startTime, endTime) === 1 ? 'hour' : 'hours'}</span>
+              </div>
+              <div className="flex items-start justify-between p-3 bg-muted rounded-sm border border-border">
+                <span className="text-sm text-muted-foreground">Total:</span>
+                <span className="text-sm text-foreground">{(() => {
+                  const b = calculateTotalPrice(room.pricePerHour, startTime, endTime);
+                  return b ? `${formatPrice(b.total)}` : 'N/A';
+                })()}</span>
               </div>
               <div className="flex items-start justify-between p-3 bg-muted rounded-sm border border-border">
                 <span className="text-sm text-muted-foreground">Booked by:</span>
@@ -242,6 +259,25 @@ export function ReservationForm({ room, user, onConfirm, onCancel }: Reservation
               </div>
 
               <div className="pt-4 border-t border-border">
+                {/* Live pricing breakdown during selection */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-4">
+                  <div className="p-3 bg-muted rounded-sm border border-border flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">Price / hr</span>
+                    <span className="text-sm text-foreground">{room.pricePerHour != null ? `${formatPrice(room.pricePerHour)} / hr` : 'N/A'}</span>
+                  </div>
+                  <div className="p-3 bg-muted rounded-sm border border-border flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">Hours</span>
+                    <span className="text-sm text-foreground">{diffHours(startTime, endTime) ?? '-'}</span>
+                  </div>
+                  <div className="p-3 bg-muted rounded-sm border border-border flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">Total</span>
+                    <span className="text-sm text-foreground">{(() => {
+                      const b = calculateTotalPrice(room.pricePerHour, startTime, endTime);
+                      return b ? `${formatPrice(b.total)}` : 'N/A';
+                    })()}</span>
+                  </div>
+                </div>
+
                 <div className="flex items-start gap-2 p-3 bg-muted rounded-sm mb-4 border border-border">
                   <div className="text-sm text-foreground">
                     <p>Reservation will be checked for conflicts across all branch servers.</p>

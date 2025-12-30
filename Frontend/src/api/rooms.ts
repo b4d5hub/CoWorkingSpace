@@ -9,7 +9,31 @@ type RoomDTO = {
   amenities?: string[];
   imageUrl?: string;
   available: boolean;
+  // Optional per-hour price; backend may or may not provide this
+  pricePerHour?: number | string;
+  // Some backends may use alternative keys; we will coerce below via fallbacks
+  price?: number | string;
+  hourlyRate?: number | string;
+  tarifHoraire?: number | string;
+  prixParHeure?: number | string;
 };
+
+function coerceNumber(v: unknown): number | undefined {
+  if (typeof v === 'number' && isFinite(v)) return v;
+  if (typeof v === 'string' && v.trim() !== '') {
+    const n = Number(v);
+    if (!isNaN(n) && isFinite(n)) return n;
+  }
+  return undefined;
+}
+
+function extractPricePerHour(d: Partial<RoomDTO>): number | undefined {
+  const candidate =
+    (d as any).pricePerHour ?? (d as any).price_per_hour ?? (d as any).price ?? (d as any).hourlyRate ?? (d as any).tarifHoraire ?? (d as any).prixParHeure;
+  const n = coerceNumber(candidate);
+  // Allow 0 as a valid number (free rooms), return undefined only when truly absent/invalid
+  return typeof n === 'number' ? n : undefined;
+}
 
 export async function listRooms(): Promise<Room[]> {
   try {
@@ -24,6 +48,7 @@ export async function listRooms(): Promise<Room[]> {
         d.imageUrl ||
         'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80',
       available: typeof d.available === 'boolean' ? d.available : true,
+      pricePerHour: extractPricePerHour(d),
     }));
   } catch (primaryErr) {
     console.warn('[rooms] /api/rooms failed, falling back to /api/salles', primaryErr);
@@ -39,6 +64,7 @@ export async function listRooms(): Promise<Room[]> {
         d.imageUrl ||
         'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80',
       available: typeof d.available === 'boolean' ? d.available : true,
+      pricePerHour: extractPricePerHour(d),
     }));
   }
 }
@@ -59,6 +85,7 @@ export async function createRoom(payload: UpsertRoomInput): Promise<Room> {
     amenities: dto.amenities ?? [],
     imageUrl: dto.imageUrl || '',
     available: dto.available,
+    pricePerHour: extractPricePerHour(dto),
   };
 }
 
@@ -76,6 +103,7 @@ export async function updateRoom(id: string, payload: Partial<UpsertRoomInput>):
     amenities: dto.amenities ?? [],
     imageUrl: dto.imageUrl || '',
     available: dto.available,
+    pricePerHour: extractPricePerHour(dto),
   };
 }
 

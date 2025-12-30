@@ -21,6 +21,7 @@ import {
   MoreHorizontal,
 } from 'lucide-react';
 import type { Room, Reservation } from '../App';
+import { formatPrice } from '../lib/pricing';
 
 type DashboardProps = {
   rooms: Room[];
@@ -213,6 +214,16 @@ export function Dashboard({ rooms, reservations, onSelectRoom, initialLocation =
                     )}
                   </div>
                 </div>
+
+                {/* Per-hour price display when available */}
+                {typeof room.pricePerHour === 'number' && (
+                  <div className="flex items-center justify-between p-2 rounded-sm bg-muted border border-border">
+                    <div className="flex items-center gap-2 text-foreground">
+                      <Clock className="w-4 h-4" />
+                      <span className="text-sm">{formatPrice(room.pricePerHour)} / hr</span>
+                    </div>
+                  </div>
+                )}
 
                 <Button
                   onClick={() => onSelectRoom(room)}

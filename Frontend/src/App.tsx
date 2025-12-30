@@ -33,6 +33,8 @@ export type Room = {
   amenities: string[];
   imageUrl: string;
   available: boolean;
+  // Optional per-hour pricing for the room (frontend-only; provided by backend when available)
+  pricePerHour?: number;
 };
 
 export type Reservation = {
@@ -422,6 +424,7 @@ export default function App() {
           <MyReservations
             // The reservations state is already scoped to the current user via loadUserReservations()
             reservations={reservations}
+            rooms={rooms}
             onCancel={handleCancelReservation}
           />
         )}
