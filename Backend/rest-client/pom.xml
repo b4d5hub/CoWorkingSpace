@@ -4,7 +4,7 @@
         <groupId>com.example.coworking</groupId>
         <artifactId>coworking-space</artifactId>
         <version>1.0.0</version>
-        <relativePath>../..</relativePath>
+        <relativePath>../../pom.xml</relativePath>
     </parent>
     <artifactId>rest-client</artifactId>
     <packaging>jar</packaging>
@@ -41,6 +41,13 @@
             <artifactId>common</artifactId>
             <version>1.0.0</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <build>
