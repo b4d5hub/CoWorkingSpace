@@ -84,7 +84,7 @@ export function SystemStatus({ onBack }: SystemStatusProps) {
       <div className="mb-6">
         <Button variant="ghost" onClick={onBack} className="text-foreground hover:text-foreground/70">
           <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to Dashboard
+          Back
         </Button>
       </div>
 

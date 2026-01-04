@@ -35,14 +35,16 @@ export function Navbar({ user, currentPage, onNavigate, onLogout }: NavbarProps)
                 <LayoutDashboard className="w-4 h-4 mr-2" />
                 Dashboard
               </Button>
-              <Button
-                variant={currentPage === 'my-reservations' ? 'default' : 'ghost'}
-                onClick={() => onNavigate('my-reservations')}
-                className={currentPage === 'my-reservations' ? 'bg-primary hover:bg-primary/90 text-primary-foreground border-0' : 'text-foreground hover:text-foreground/70'}
-              >
-                <Calendar className="w-4 h-4 mr-2" />
-                My Reservations
-              </Button>
+              {user && (
+                <Button
+                  variant={currentPage === 'my-reservations' ? 'default' : 'ghost'}
+                  onClick={() => onNavigate('my-reservations')}
+                  className={currentPage === 'my-reservations' ? 'bg-primary hover:bg-primary/90 text-primary-foreground border-0' : 'text-foreground hover:text-foreground/70'}
+                >
+                  <Calendar className="w-4 h-4 mr-2" />
+                  My Reservations
+                </Button>
+              )}
               {user?.role === 'admin' && (
                 <Button
                   variant={currentPage.startsWith('admin') ? 'default' : 'ghost'}
@@ -70,19 +72,30 @@ export function Navbar({ user, currentPage, onNavigate, onLogout }: NavbarProps)
                 <Moon className="w-4 h-4" />
               )}
             </Button>
-            
-            <Button
-              variant="ghost"
-              onClick={() => onNavigate('profile')}
-              className="text-foreground hover:text-foreground/70"
-            >
-              <UserIcon className="w-4 h-4 sm:mr-2" />
-              <span className="hidden sm:inline">{user?.name}</span>
-            </Button>
-            <Button variant="outline" onClick={onLogout} className="border-border text-foreground hover:bg-muted">
-              <LogOut className="w-4 h-4 sm:mr-2" />
-              <span className="hidden sm:inline">Logout</span>
-            </Button>
+            {user ? (
+              <>
+                <Button
+                  variant="ghost"
+                  onClick={() => onNavigate('profile')}
+                  className="text-foreground hover:text-foreground/70"
+                >
+                  <UserIcon className="w-4 h-4 sm:mr-2" />
+                  <span className="hidden sm:inline">{user?.name}</span>
+                </Button>
+                <Button variant="outline" onClick={onLogout} className="border-border text-foreground hover:bg-muted">
+                  <LogOut className="w-4 h-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Logout</span>
+                </Button>
+              </>
+            ) : (
+              <Button
+                variant="outline"
+                onClick={() => onNavigate('login')}
+                className="border-border text-foreground hover:bg-muted"
+              >
+                Login
+              </Button>
+            )}
           </div>
         </div>
       </div>

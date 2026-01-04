@@ -8,6 +8,7 @@ import { COUNTRY_CODES } from '../lib/countryCodes';
 import { Badge } from './ui/badge';
 import { ArrowLeft, User, Mail, Shield, Calendar, Clock, MapPin, Edit2, Save, X, Phone } from 'lucide-react';
 import { toast } from 'sonner@2.0.3';
+import { changePassword } from '../api/users';
 import type { User as UserType, AppUser } from '../App';
 
 type ProfilePageProps = {
@@ -36,6 +37,12 @@ export function ProfilePage({ user, onBack, onUpdateProfile }: ProfilePageProps)
   })();
   const [editedCountryCode, setEditedCountryCode] = useState<string>(initialCode);
   const [editedPhoneLocal, setEditedPhoneLocal] = useState<string>(initialLocal);
+
+  // Change password state
+  const [oldPassword, setOldPassword] = useState<string>('');
+  const [newPassword, setNewPassword] = useState<string>('');
+  const [confirmPassword, setConfirmPassword] = useState<string>('');
+  const [changingPwd, setChangingPwd] = useState<boolean>(false);
 
   const handleSave = () => {
     if (!editedName.trim()) {
@@ -80,6 +87,34 @@ export function ProfilePage({ user, onBack, onUpdateProfile }: ProfilePageProps)
     setEditedCountryCode(code);
     setEditedPhoneLocal(local);
     setIsEditing(false);
+  };
+
+  const handleChangePassword = async () => {
+    if (!oldPassword || !newPassword || !confirmPassword) {
+      toast.error('Please fill in all password fields');
+      return;
+    }
+    if (newPassword.length < 6) {
+      toast.error('New password must be at least 6 characters');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      toast.error('New password and confirmation do not match');
+      return;
+    }
+    try {
+      setChangingPwd(true);
+      await changePassword(user.id, { oldPassword, newPassword });
+      setOldPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+      toast.success('Password changed successfully');
+    } catch (e: any) {
+      const msg = e?.message ? String(e.message) : 'Failed to change password';
+      toast.error('Failed to change password', { description: msg });
+    } finally {
+      setChangingPwd(false);
+    }
   };
 
   return (
@@ -312,6 +347,53 @@ export function ProfilePage({ user, onBack, onUpdateProfile }: ProfilePageProps)
           </CardContent>
         </Card>
       </div>
+
+      {/* Change Password */}
+      <Card className="bg-card border-border">
+        <CardHeader>
+          <CardTitle className="text-foreground">Change Password</CardTitle>
+          <CardDescription>Update your password. You will need your current password.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <Label htmlFor="old-password">Current Password</Label>
+              <Input
+                id="old-password"
+                type="password"
+                value={oldPassword}
+                onChange={(e) => setOldPassword(e.target.value)}
+                placeholder="Enter current password"
+              />
+            </div>
+            <div>
+              <Label htmlFor="new-password">New Password</Label>
+              <Input
+                id="new-password"
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="Enter new password"
+              />
+            </div>
+            <div>
+              <Label htmlFor="confirm-password">Confirm New Password</Label>
+              <Input
+                id="confirm-password"
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Repeat new password"
+              />
+            </div>
+          </div>
+          <div className="mt-4">
+            <Button onClick={handleChangePassword} disabled={changingPwd} className="bg-primary hover:bg-primary/90 text-primary-foreground">
+              {changingPwd ? 'Changing...' : 'Change Password'}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Additional Info for Admins */}
       {user.role === 'admin' && (

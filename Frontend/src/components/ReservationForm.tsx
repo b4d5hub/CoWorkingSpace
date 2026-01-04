@@ -112,15 +112,11 @@ export function ReservationForm({ room, user, onConfirm, onCancel }: Reservation
                   return b ? `${formatPrice(b.total)}` : 'N/A';
                 })()}</span>
               </div>
-              <div className="flex items-start justify-between p-3 bg-muted rounded-sm border border-border">
-                <span className="text-sm text-muted-foreground">Booked by:</span>
-                <span className="text-sm text-foreground">{user.name}</span>
-              </div>
             </div>
 
             <div className="p-4 bg-muted border border-border rounded-sm">
               <p className="text-sm text-foreground">
-                Your reservation will be synchronized across all RMI servers in the distributed system.
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi nec ne lacus tincidunt.
               </p>
             </div>
 
@@ -280,7 +276,7 @@ export function ReservationForm({ room, user, onConfirm, onCancel }: Reservation
 
                 <div className="flex items-start gap-2 p-3 bg-muted rounded-sm mb-4 border border-border">
                   <div className="text-sm text-foreground">
-                    <p>Reservation will be checked for conflicts across all branch servers.</p>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing.</p>
                   </div>
                 </div>
                 <Button

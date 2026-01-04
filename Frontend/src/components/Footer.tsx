@@ -27,26 +27,26 @@ export function Footer({ onNavigate }: FooterProps) {
             <ul className="space-y-2">
               <li>
                 <button
-                  onClick={() => onNavigate('dashboard')}
+                  onClick={() => onNavigate('about-us')}
                   className="text-muted-foreground hover:text-foreground text-sm transition-colors"
                 >
-                  Room Availability
+                  About Us
                 </button>
               </li>
               <li>
                 <button
-                  onClick={() => onNavigate('my-reservations')}
+                  onClick={() => onNavigate('contact-us')}
                   className="text-muted-foreground hover:text-foreground text-sm transition-colors"
                 >
-                  My Reservations
+                  Contact Us
                 </button>
               </li>
               <li>
                 <button
-                  onClick={() => onNavigate('profile')}
+                  onClick={() => onNavigate('login')}
                   className="text-muted-foreground hover:text-foreground text-sm transition-colors"
                 >
-                  My Profile
+                  Member Login
                 </button>
               </li>
             </ul>
@@ -63,15 +63,6 @@ export function Footer({ onNavigate }: FooterProps) {
                 >
                   <Activity className="w-4 h-4" />
                   System Status
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => onNavigate('architecture')}
-                  className="text-muted-foreground hover:text-foreground text-sm transition-colors flex items-center gap-2"
-                >
-                  <Network className="w-4 h-4" />
-                  Architecture
                 </button>
               </li>
             </ul>

@@ -29,7 +29,7 @@ export async function getUser(id: string): Promise<AppUser> {
   return mapUser(data);
 }
 
-export async function updateUser(id: string, payload: Partial<{ name: string; phone: string; role: 'user' | 'admin' }>): Promise<AppUser> {
+export async function updateUser(id: string, payload: Partial<{ name: string; email: string; phone: string; role: 'user' | 'admin' }>): Promise<AppUser> {
   const dto = await apiRequest<UserResponse>(`/api/users/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
@@ -50,4 +50,12 @@ export async function promoteUser(id: string): Promise<AppUser> {
 export async function demoteUser(id: string): Promise<AppUser> {
   const dto = await apiRequest<UserResponse>(`/api/users/${id}/demote`, { method: 'POST' });
   return mapUser(dto);
+}
+
+export async function changePassword(id: string, params: { oldPassword: string; newPassword: string }): Promise<void> {
+  await apiRequest<void>(`/api/users/${id}/change-password`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(params),
+  });
 }

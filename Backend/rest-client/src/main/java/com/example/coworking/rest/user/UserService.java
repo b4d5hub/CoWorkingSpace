@@ -41,4 +41,22 @@ public class UserService {
                 .filter(u -> passwordEncoder.matches(rawPassword, u.getPasswordHash()))
                 .orElse(null);
     }
+
+    /**
+     * Change a user's password if the provided old password matches.
+     * @return true if changed, false otherwise (user not found or old password mismatch)
+     */
+    public boolean changePassword(Long userId, String oldPassword, String newPassword) {
+        if (userId == null || oldPassword == null || newPassword == null || newPassword.trim().isEmpty()) {
+            return false;
+        }
+        return userRepository.findById(userId).map(u -> {
+            if (!passwordEncoder.matches(oldPassword, u.getPasswordHash())) {
+                return false;
+            }
+            u.setPasswordHash(passwordEncoder.encode(newPassword));
+            userRepository.save(u);
+            return true;
+        }).orElse(false);
+    }
 }

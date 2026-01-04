@@ -18,6 +18,8 @@ import {
   Building2,
   ChevronDown,
   Play,
+  Moon,
+  Sun,
 } from 'lucide-react';
 import {
   Accordion,
@@ -25,6 +27,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from './ui/accordion';
+import { useTheme } from "../theme/ThemeContext";
 
 type HomepageProps = {
   onGetStarted: () => void;
@@ -37,15 +40,16 @@ export function Homepage({ onGetStarted, onNavigateToLocation, isLoggedIn = fals
   const featuresRef = useRef<HTMLElement>(null);
   const roomTypesRef = useRef<HTMLElement>(null);
   const faqRef = useRef<HTMLElement>(null);
+  const { theme, toggleTheme } = useTheme();
 
   const scrollToSection = (ref: React.RefObject<HTMLElement>) => {
     ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-border">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-background border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
@@ -89,13 +93,28 @@ export function Homepage({ onGetStarted, onNavigateToLocation, isLoggedIn = fals
               </Button>
             </nav>
 
-            {/* CTA Button */}
-            <Button
-              onClick={onGetStarted}
-              className="bg-primary hover:bg-primary/90 text-primary-foreground border-0"
-            >
-              {isLoggedIn ? 'Dashboard' : 'Get Started'}
-            </Button>
+            {/* Right Controls */}
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                onClick={toggleTheme}
+                aria-pressed={theme === 'darkBlue'}
+                title={theme === 'darkBlue' ? 'Switch to Light Mode' : 'Switch to Dark Blue Mode'}
+                className="text-foreground hover:text-foreground/70"
+              >
+                {theme === 'darkBlue' ? (
+                  <Sun className="w-4 h-4" />
+                ) : (
+                  <Moon className="w-4 h-4" />
+                )}
+              </Button>
+              <Button
+                onClick={onGetStarted}
+                className="bg-primary hover:bg-primary/90 text-primary-foreground border-0"
+              >
+                {isLoggedIn ? 'Dashboard' : 'Get Started'}
+              </Button>
+            </div>
           </div>
         </div>
       </header>
@@ -159,8 +178,8 @@ export function Homepage({ onGetStarted, onNavigateToLocation, isLoggedIn = fals
         </div>
       </section>
 
-      {/* Workspace Solutions Section - Beige Background */}
-      <section ref={featuresRef} className="py-20 px-4 sm:px-6 lg:px-8 bg-[#F5EDE4]">
+      {/* Workspace Solutions Section - Muted (theme-aware) Background */}
+      <section ref={featuresRef} className="py-20 px-4 sm:px-6 lg:px-8 bg-muted">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-foreground mb-4">
@@ -170,7 +189,7 @@ export function Homepage({ onGetStarted, onNavigateToLocation, isLoggedIn = fals
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Feature Card 1 */}
-            <Card className="bg-white border-0 shadow-sm hover:shadow-md transition-shadow">
+            <Card className="bg-card border border-border shadow-sm hover:shadow-md transition-shadow">
               <CardContent className="p-6">
                 <div className="w-10 h-10 bg-red-100 rounded-sm flex items-center justify-center mb-4">
                   <Calendar className="w-5 h-5 text-red-600" />
@@ -186,7 +205,7 @@ export function Homepage({ onGetStarted, onNavigateToLocation, isLoggedIn = fals
             </Card>
 
             {/* Feature Card 2 */}
-            <Card className="bg-white border-0 shadow-sm hover:shadow-md transition-shadow">
+            <Card className="bg-card border border-border shadow-sm hover:shadow-md transition-shadow">
               <CardContent className="p-6">
                 <div className="w-10 h-10 bg-red-100 rounded-sm flex items-center justify-center mb-4">
                   <Building2 className="w-5 h-5 text-red-600" />
@@ -202,7 +221,7 @@ export function Homepage({ onGetStarted, onNavigateToLocation, isLoggedIn = fals
             </Card>
 
             {/* Feature Card 3 */}
-            <Card className="bg-white border-0 shadow-sm hover:shadow-md transition-shadow">
+            <Card className="bg-card border border-border shadow-sm hover:shadow-md transition-shadow">
               <CardContent className="p-6">
                 <div className="w-10 h-10 bg-red-100 rounded-sm flex items-center justify-center mb-4">
                   <Users className="w-5 h-5 text-red-600" />
@@ -220,7 +239,7 @@ export function Homepage({ onGetStarted, onNavigateToLocation, isLoggedIn = fals
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
             {/* Feature Card 4 */}
-            <Card className="bg-white border-0 shadow-sm hover:shadow-md transition-shadow">
+            <Card className="bg-card border border-border shadow-sm hover:shadow-md transition-shadow">
               <CardContent className="p-6">
                 <div className="w-10 h-10 bg-red-100 rounded-sm flex items-center justify-center mb-4">
                   <Shield className="w-5 h-5 text-red-600" />
@@ -236,7 +255,7 @@ export function Homepage({ onGetStarted, onNavigateToLocation, isLoggedIn = fals
             </Card>
 
             {/* Feature Card 5 */}
-            <Card className="bg-white border-0 shadow-sm hover:shadow-md transition-shadow">
+            <Card className="bg-card border border-border shadow-sm hover:shadow-md transition-shadow">
               <CardContent className="p-6">
                 <div className="w-10 h-10 bg-red-100 rounded-sm flex items-center justify-center mb-4">
                   <Zap className="w-5 h-5 text-red-600" />
@@ -252,7 +271,7 @@ export function Homepage({ onGetStarted, onNavigateToLocation, isLoggedIn = fals
             </Card>
 
             {/* Feature Card 6 */}
-            <Card className="bg-white border-0 shadow-sm hover:shadow-md transition-shadow">
+            <Card className="bg-card border border-border shadow-sm hover:shadow-md transition-shadow">
               <CardContent className="p-6">
                 <div className="w-10 h-10 bg-red-100 rounded-sm flex items-center justify-center mb-4">
                   <Coffee className="w-5 h-5 text-red-600" />
@@ -293,7 +312,7 @@ export function Homepage({ onGetStarted, onNavigateToLocation, isLoggedIn = fals
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
               </div>
-              <div className="absolute bottom-4 left-4 bg-white/95 backdrop-blur-sm px-4 py-2 rounded-lg">
+              <div className="absolute bottom-4 left-4 bg-background/90 backdrop-blur-sm px-4 py-2 rounded-lg border border-border">
                 <div className="text-foreground mb-1">Agadir</div>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Building2 className="w-4 h-4" />
@@ -311,7 +330,7 @@ export function Homepage({ onGetStarted, onNavigateToLocation, isLoggedIn = fals
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
               </div>
-              <div className="absolute bottom-4 left-4 bg-white/95 backdrop-blur-sm px-4 py-2 rounded-lg">
+              <div className="absolute bottom-4 left-4 bg-background/90 backdrop-blur-sm px-4 py-2 rounded-lg border border-border">
                 <div className="text-foreground mb-1">Marrakech</div>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Building2 className="w-4 h-4" />
@@ -329,7 +348,7 @@ export function Homepage({ onGetStarted, onNavigateToLocation, isLoggedIn = fals
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
               </div>
-              <div className="absolute bottom-4 left-4 bg-white/95 backdrop-blur-sm px-4 py-2 rounded-lg">
+              <div className="absolute bottom-4 left-4 bg-background/90 backdrop-blur-sm px-4 py-2 rounded-lg border border-border">
                 <div className="text-foreground mb-1">Casablanca</div>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Building2 className="w-4 h-4" />
@@ -350,7 +369,7 @@ export function Homepage({ onGetStarted, onNavigateToLocation, isLoggedIn = fals
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
             {/* Private Space Card */}
-            <Card className="bg-white border-0">
+            <Card className="bg-card border border-border">
               <CardContent className="p-8">
                 <h3 className="text-foreground mb-6">Private Space</h3>
                 
@@ -397,7 +416,7 @@ export function Homepage({ onGetStarted, onNavigateToLocation, isLoggedIn = fals
             </Card>
 
             {/* Shared Desk Card */}
-            <Card className="bg-white border-0">
+            <Card className="bg-card border border-border">
               <CardContent className="p-8">
                 <h3 className="text-foreground mb-6">Shared Desk</h3>
                 
@@ -446,15 +465,15 @@ export function Homepage({ onGetStarted, onNavigateToLocation, isLoggedIn = fals
         </div>
       </section>
 
-      {/* FAQ Section - Light Beige Background */}
-      <section ref={faqRef} className="py-20 px-4 sm:px-6 lg:px-8 bg-[#F5EDE4]">
+      {/* FAQ Section - Muted (theme-aware) Background */}
+      <section ref={faqRef} className="py-20 px-4 sm:px-6 lg:px-8 bg-muted">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-foreground mb-4">Find answers to questions about coworking</h2>
           </div>
 
           <Accordion type="single" collapsible className="space-y-4">
-            <AccordionItem value="item-1" className="bg-white border-0 rounded-lg px-6">
+            <AccordionItem value="item-1" className="bg-card border border-border rounded-lg px-6">
               <AccordionTrigger className="text-foreground hover:no-underline">
                 What is included in a coworking membership?
               </AccordionTrigger>
@@ -465,7 +484,7 @@ export function Homepage({ onGetStarted, onNavigateToLocation, isLoggedIn = fals
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="item-2" className="bg-white border-0 rounded-lg px-6">
+            <AccordionItem value="item-2" className="bg-card border border-border rounded-lg px-6">
               <AccordionTrigger className="text-foreground hover:no-underline">
                 Can I book a room for just one day?
               </AccordionTrigger>
@@ -476,7 +495,7 @@ export function Homepage({ onGetStarted, onNavigateToLocation, isLoggedIn = fals
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="item-3" className="bg-white border-0 rounded-lg px-6">
+            <AccordionItem value="item-3" className="bg-card border border-border rounded-lg px-6">
               <AccordionTrigger className="text-foreground hover:no-underline">
                 How does room availability work?
               </AccordionTrigger>
@@ -487,7 +506,7 @@ export function Homepage({ onGetStarted, onNavigateToLocation, isLoggedIn = fals
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="item-4" className="bg-white border-0 rounded-lg px-6">
+            <AccordionItem value="item-4" className="bg-card border border-border rounded-lg px-6">
               <AccordionTrigger className="text-foreground hover:no-underline">
                 What if I need to cancel my booking?
               </AccordionTrigger>
@@ -498,7 +517,7 @@ export function Homepage({ onGetStarted, onNavigateToLocation, isLoggedIn = fals
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="item-5" className="bg-white border-0 rounded-lg px-6">
+            <AccordionItem value="item-5" className="bg-card border border-border rounded-lg px-6">
               <AccordionTrigger className="text-foreground hover:no-underline">
                 Are there different pricing options?
               </AccordionTrigger>
@@ -546,7 +565,7 @@ export function Homepage({ onGetStarted, onNavigateToLocation, isLoggedIn = fals
                 className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 flex items-center justify-center">
-                <button className="w-16 h-16 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-110">
+                <button className="w-16 h-16 bg-background/80 hover:bg-background rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-110 border border-border backdrop-blur-sm">
                   <Play className="w-6 h-6 text-foreground ml-1" />
                 </button>
               </div>

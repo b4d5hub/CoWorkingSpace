@@ -68,7 +68,7 @@
     };
 
     return (
-    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden bg-white">
+    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden bg-background">
       {/* Back to Homepage Button - Top Left */}
       <Button
         onClick={onBackToHome}
@@ -87,13 +87,13 @@
         </div>
 
         <Tabs defaultValue="login" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 bg-stone-100">
+          <TabsList className="grid w-full grid-cols-2 bg-muted">
             <TabsTrigger value="login">Login</TabsTrigger>
             <TabsTrigger value="register">Register</TabsTrigger>
           </TabsList>
 
           <TabsContent value="login">
-            <Card className="bg-white border-stone-200">
+            <Card className="bg-card border-border">
               <CardHeader>
                 <CardTitle className="text-foreground">Welcome Back</CardTitle>
                 <CardDescription className="text-muted-foreground">Sign in to manage your room reservations</CardDescription>
@@ -110,7 +110,7 @@
                         placeholder="your.email@company.com"
                         value={loginEmail}
                         onChange={(e) => setLoginEmail(e.target.value)}
-                        className="pl-10 border-stone-200"
+                        className="pl-10 border-border"
                         required
                       />
                     </div>
@@ -125,7 +125,7 @@
                         placeholder="••••••••"
                         value={loginPassword}
                         onChange={(e) => setLoginPassword(e.target.value)}
-                        className="pl-10 border-stone-200"
+                        className="pl-10 border-border"
                         required
                       />
                     </div>
@@ -149,7 +149,7 @@
           </TabsContent>
 
           <TabsContent value="register">
-            <Card className="bg-white border-stone-200">
+            <Card className="bg-card border-border">
               <CardHeader>
                 <CardTitle className="text-foreground">Create Account</CardTitle>
                 <CardDescription className="text-muted-foreground">Register to start booking meeting rooms</CardDescription>
@@ -166,7 +166,7 @@
                         placeholder="John Doe"
                         value={registerName}
                         onChange={(e) => setRegisterName(e.target.value)}
-                        className="pl-10 border-stone-200"
+                        className="pl-10 border-border"
                         required
                       />
                     </div>
@@ -181,7 +181,7 @@
                         placeholder="your.email@company.com"
                         value={registerEmail}
                         onChange={(e) => setRegisterEmail(e.target.value)}
-                        className="pl-10 border-stone-200"
+                        className="pl-10 border-border"
                         required
                       />
                     </div>
@@ -198,7 +198,7 @@
                             position="popper"
                             side="bottom"
                             sideOffset={6}
-                            className="bg-white z-50 w-[300px] shadow-lg border border-stone-200"
+                            className="bg-card z-50 w-[300px] shadow-lg border border-border"
                             style={{ maxHeight: '320px' }}
                           >
                             <div className="max-h-[320px] overflow-y-auto">
@@ -217,7 +217,7 @@
                         placeholder="Phone number"
                         value={registerPhone}
                         onChange={(e) => setRegisterPhone(e.target.value)}
-                        className="border-stone-200"
+                        className="border-border"
                         required
                       />
                     </div>
@@ -232,7 +232,7 @@
                         placeholder="••••••••"
                         value={registerPassword}
                         onChange={(e) => setRegisterPassword(e.target.value)}
-                        className="pl-10 border-stone-200"
+                        className="pl-10 border-border"
                         required
                       />
                     </div>

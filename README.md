@@ -15,4 +15,9 @@ From project root:
 1. mvn clean package -DskipTests
 2. In `rmi-server` module: mvn spring-boot:run (this starts RMI registry & server)
 3. In `rest-client` module: mvn spring-boot:run
-4. In `react-client`: npm install && npm start
+4. In `react-client`: npm install && npm start or npm run dev
+
+mvn -q -DskipTests clean install
+mvn -q -pl Backend\rmi-server spring-boot:run
+mvn -q -pl Backend\rest-client spring-boot:run
+npm run dev

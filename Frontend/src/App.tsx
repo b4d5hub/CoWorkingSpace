@@ -12,7 +12,10 @@ import { AdminStats } from "./components/AdminStats";
 import { SystemArchitecture } from "./components/SystemArchitecture";
 import { ProfilePage } from "./components/ProfilePage";
 import { SystemStatus } from "./components/SystemStatus";
+import { AboutUs } from "./components/AboutUs";
+import { ContactUs } from "./components/ContactUs";
 import { Navbar } from "./components/Navbar";
+import { PublicHeader } from "./components/PublicHeader";
 import { Footer } from "./components/Footer";
 import { Toaster } from "./components/ui/sonner";
 import { toast } from 'sonner@2.0.3';
@@ -72,7 +75,9 @@ export type Page =
   | "admin-stats"
   | "architecture"
   | "profile"
-  | "status";
+  | "status"
+  | "about-us"
+  | "contact-us";
 
 // --- Lightweight History Router helpers (clean URLs, no #) ---
 function pathToPage(pathname: string): Page {
@@ -92,6 +97,8 @@ function pathToPage(pathname: string): Page {
     case "/architecture": return "architecture";
     case "/profile": return "profile";
     case "/status": return "status";
+    case "/about": return "about-us";
+    case "/contact": return "contact-us";
     default: return "home";
   }
 }
@@ -111,6 +118,8 @@ function pageToPath(p: Page): string {
     case "architecture": return "/architecture";
     case "profile": return "/profile";
     case "status": return "/status";
+    case "about-us": return "/about";
+    case "contact-us": return "/contact";
     default: return "/";
   }
 }
@@ -361,6 +370,13 @@ export default function App() {
     }
   }, [currentPage]);
 
+  // Route guard: dashboard requires authentication
+  useEffect(() => {
+    if (currentPage === 'dashboard' && !currentUser) {
+      setCurrentPage('login');
+    }
+  }, [currentPage, currentUser]);
+
   if (currentPage === "home") {
     return (
       <>
@@ -378,6 +394,10 @@ export default function App() {
   if (currentPage === "login") {
     return (
       <>
+        <PublicHeader
+          onLogoClick={() => setCurrentPage('home')}
+          onGetStarted={() => setCurrentPage('login')}
+        />
         <LoginPage 
           onLogin={handleLogin}
           onBackToHome={() => setCurrentPage("home")}
@@ -390,19 +410,26 @@ export default function App() {
   return (
     <div className="min-h-screen">
       <Toaster />
-      <Navbar
-        user={currentUser}
-        currentPage={currentPage}
-        onNavigate={setCurrentPage}
-        onLogout={handleLogout}
-      />
+      {currentUser ? (
+        <Navbar
+          user={currentUser}
+          currentPage={currentPage}
+          onNavigate={setCurrentPage}
+          onLogout={handleLogout}
+        />
+      ) : (
+        <PublicHeader
+          onLogoClick={() => setCurrentPage('home')}
+          onGetStarted={() => setCurrentPage('login')}
+        />
+      )}
       <main className="relative">
         {/* Background effects */}
         <div className="fixed inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-1/4 -left-48 w-96 h-96 bg-cyan-500/5 rounded-full blur-3xl"></div>
           <div className="absolute bottom-1/4 -right-48 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl"></div>
         </div>
-        {currentPage === "dashboard" && (
+        {currentPage === "dashboard" && currentUser && (
           <Dashboard
             rooms={rooms}
             reservations={reservations}
@@ -491,6 +518,12 @@ export default function App() {
           <SystemStatus
             onBack={() => setCurrentPage("dashboard")}
           />
+        )}
+        {currentPage === "about-us" && (
+          <AboutUs />
+        )}
+        {currentPage === "contact-us" && (
+          <ContactUs />
         )}
       </main>
       <Footer onNavigate={setCurrentPage} />
